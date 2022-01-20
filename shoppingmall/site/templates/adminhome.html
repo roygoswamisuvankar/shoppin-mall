@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    <title>Admin - Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin : 0;
+  padding : 0;
+}
+
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+[class*="col-"] {
+  float: left;
+  padding: 15px;
+}
+
+html {
+  font-family: "Lucida Sans", sans-serif;
+}
+
+.header {
+  background-color: #9933cc;
+  color: #ffffff;
+  padding: 15px;
+}
+
+.menu ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu li {
+  padding: 8px;
+  margin-bottom: 7px;
+  background-color: #33b5e5;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.menu li:hover {
+  background-color: #0099cc;
+}
+
+.aside {
+  background-color: #33b5e5;
+  padding: 15px;
+  color: #ffffff;
+  text-align: center;
+  font-size: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.footer {
+  background-color: #0099cc;
+  color: #ffffff;
+  text-align: center;
+  font-size: 12px;
+  padding: 15px;
+}
+
+/* For mobile phones: */
+[class*="col-"] {
+  width: 100%;
+}
+
+@media only screen and (min-width: 768px) {
+  /* For desktop: */
+  .col-1 {width: 8.33%;}
+  .col-2 {width: 16.66%;}
+  .col-3 {width: 25%;}
+  .col-4 {width: 33.33%;}
+  .col-5 {width: 41.66%;}
+  .col-6 {width: 50%;}
+  .col-7 {width: 58.33%;}
+  .col-8 {width: 66.66%;}
+  .col-9 {width: 75%;}
+  .col-10 {width: 83.33%;}
+  .col-11 {width: 91.66%;}
+  .col-12 {width: 100%;}
+}
+ul a{
+    text-decoration: none;
+}
+.menu li.active{
+    background-color : #0099cc;
+}
+/*form style*/
+.content{
+    border : 1px solid black;
+    border-radius : 5px;
+    padding : 15px 20px;
+}
+.inp{
+    border-radius : 5px;
+    border-bottom : 1px solid black;
+    padding : 10px 15px;
+}
+input[type="text"], input[type=password], input[type=email]{
+    border : none;
+    outline : none;
+    font-size : 17px
+    padding : 10px 15px;
+}
+textarea{
+    border : none;
+    outline : none;
+    width : 95%;
+}
+#dept{
+    border : none;
+    padding : 8px 25px;
+}
+input[type=submit]{
+    box-shadow : 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    color : white;
+    background-color : #04aa6d;
+    border : none;
+    padding : 8px 12px;
+    width : 49%;
+    font-size : 17px;
+    border-radius : 5px;
+    cursor : pointer;
+}
+input[type=reset]{
+    box-shadow : 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    color : white;
+    background-color : red;
+    border : none;
+    padding : 8px 12px;
+    width : 49%;
+    font-size : 17px;
+    border-radius : 5px;
+    cursor : pointer;
+}
+</style>
+    <!--scripting form validation using jquery-->
+    <script>
+        $(document).ready(function(){
+            $("#name").hide();
+            $("#phone").hide();
+            $("#email").hide();
+
+            /*Employee name validation*/
+            var name = /^[a-zA-Z-,]+(\s{0,1}[a-zA-Z-, ])*$/;
+            $("#in_name").on("input", function(){
+                var inname = $("#in_name").val();
+                if(!inname.match(name) || inname.length <= 4){
+                    $("#name").show();
+                    $("#save").attr("disabled", true);
+                }else{
+                    $("#name").hide();
+                    $("#save").attr("disabled", false);
+                }
+            });
+
+            /*employee phone number validation */
+            var phone = "^[0-9]+$";
+            $("#in_phone").on("input", function(){
+                var inphone = $("#in_phone").val();
+                if(!inphone.match(phone) || inphone.length < 10 ){
+                    $("#phone").show();
+                    $("#save").attr("disabled", true);
+                }else{
+                    $("#phone").hide();
+                    $("#save").attr("disabled", false);
+                }
+            });
+
+            /*email validation */
+            var email = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+            $("#in_email").on("input", function() {
+                var inemail = $("#in_email").val();
+                if(!inemail.match(email) || inemail.length < 6 ){
+                    $("#email").show()
+                    $("#save").attr("disabled", true);
+                }else{
+                    $("#email").hide();
+                    $("#save").attr("disabled", false);
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+
+<!--This is a header portion-->
+<div class="header">
+  <center>
+      <h1>Super Market Management System</h1>
+      <h3>Welcome {{ current_user.name }}</h3>
+  </center>
+</div>
+<!--this is end of header portion-->
+
+<div class="row">
+    <!--Navigation menu-->
+  <div class="col-3 menu">
+    <ul>
+        <li class="active"><a href="{% url 'home' %}">Add new Employee Records</a></li>
+        <li><a href="{% url 'showempdetails' %}">Show Employess</a></li>
+        <li>Generate Salary Sheet</li>
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+    </ul>
+  </div>
+    <!--Navigation Menu end -->
+    <!--main body content-->
+    <div class="col-6">
+        <div>
+            <center><h3><u>Employee Entry Form</u></h3></center>
+            <div style="color : green; font-size : 17px;">{{ save_data_sms }}</div>
+            <div style="color : red; font-size : 17px;">{{ error }}</div>
+            <div class="content">
+                <form action="addemp" method="post" name="myform">
+                    {% csrf_token %}
+                    <div class="inp"><i class='fas fa-user-circle'></i>
+                        <input type="text" name="empname" placeholder="Enter employee name" id="in_name" required />
+                        <label id="name" style="color : red; font-size : 17px"><sup>*</sup>Enter valid employee name</label>
+                    </div><br/>
+                    <div class="inp"><i class='fas fa-phone'></i>
+                        <input type="text" name="empphone" placeholder="Enter employee's contact no." id="in_phone" maxlength="10" required />
+                        <label id="phone" style="color : red; font-size : 17px"><sup>*</sup>Enter valid employee's contact number</label>
+                    </div><br/>
+                    <div class="inp"><i class='far fa-envelope'></i>
+                        <input type="email" name="empemail" placeholder="Enter employee email" id="in_email" required />
+                        <label id="email" style="color : red; font-size : 17px"><sup>*</sup>Enter valid employee's email address</label>
+                    </div><br/>
+                    <div class="inp"><i class='fa fa-home'></i>
+                        <textarea name="address" required></textarea>
+                    </div><br/>
+                    <div class="inp"><i class='fas fa-briefcase'></i>
+                        <select name="dept" id="dept">
+                            <option value="Cashier">Cashier</option>
+                            <option value="Sales">Sales</option>
+                            <option value="Sales Executive">Sales Executive</option>
+                            <option value="Sales Manager">Sales Manager</option>
+                            <option value="Executive">Executive</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Shop Manager">Shop Manager</option>
+                            <option value="Sales Represantitive">Sales Representative</option>
+                            <option value="IT Manager">IT Manager</option>
+                            <option value="Developer">Developer</option>
+                            <option value="Intern">Intern</option>
+                            <option value="General Manager">General Manager</option>
+                            <option value="Labour">Labour</option>
+                            <option value="Security">Security</option>
+                            <option value="Shop Kepper">Shop Kepper</option>
+                        </select>
+                    </div><br/>
+                    <div class="inp"><i class='fa fa-lock'></i>
+                        <input type="password" name="password" placeholder="Set employee password" required />
+                    </div><br/>
+                    <div>
+                        <input type="submit" name="submit" value="Save" id="save"/>
+                        <input type="reset" value="Reset" name="reset" id="reset"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--end of main body content-->
+</div>
+</body>
+</html>
