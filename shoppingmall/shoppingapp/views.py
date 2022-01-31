@@ -12,9 +12,9 @@ def index(request):
 def admin(request):
     return render(request, 'admin.html')
 
-#employee page
-def employee(request):
-    return render(request, 'employee.html')
+#employee login page
+def emplogin(request):
+    return render(request, 'emplogin.html')
 
 def home(request):
     if 'check_logged' in request.session:
@@ -76,11 +76,89 @@ def showempdetails(request):
         return render(request, 'index.html')
     return redirect('index')
 
+#delete employee details
+def empdel(request, id):
+    if 'check_logged' in request.session:
+        current_user = request.session['check_logged']
+        emp_del = employee2.objects.get(id=id)
+        emp_del.delete()
+        return redirect('showempdetails')
+    else:
+        return render(request, 'index.html')
+    return redirect('index')
 
-#logout function
+
+#employee edit function
+def empedit(request, id):
+    #return render(request, 'emp_edit.html')
+    if 'check_logged' in request.session:
+        current_user = request.session['check_logged']
+        data = admin2.objects.get(phone=current_user)
+        ed = employee2.objects.get(id = id)
+        param = {'current_user': data, 'emp_data': ed }
+        return render(request, 'emp_edit.html', param)
+    else:
+        return render(request, 'index.html')
+    return redirect('index')
+
+#update employe records
+def updateemprecord(request):
+    if 'check_logged' in request.session:
+        current_user = request.session['check_logged']
+        if request.method == 'POST':
+            id = request.POST.get('id')
+            name = request.POST.get('empname')
+            phone = request.POST.get('empphone')
+            email = request.POST.get('empemail')
+            address = request.POST.get('address')
+            dept = request.POST.get('dept')
+            update_data = employee2.objects.filter(id = id).update(name=name, phone=phone, email=email, address=address, dept=dept)
+            return redirect('showempdetails')
+        #return render(request, 'adminhome.html', { 'current_user ' : current_user })
+    return render(request, 'index.html')
+###############################################################################   employee sections #################################
+#control session of employees login
+def emphome2(request):
+    if 'check_emp' in request.session:
+        current_emp = request.session['check_emp']
+        emp_data = employee2.objects.get(phone = current_emp)
+        param = { 'current_emp' : emp_data }
+        return render(request, 'emp_home.html', param)
+    else:
+        return redirect('index')
+    return redirect(request, 'index.html')
+
+#employee login section, create employee login function
+def emplogin2(request):
+    #return redirect(request, 'index.html')
+    if request.method == 'POST':
+        phone = request.POST.get('phone')
+        password = request.POST.get('password')
+        # hashing technique
+        hash = hashlib.md5(password.encode())
+        pass1 = hash.hexdigest()
+        check_emp = employee2.objects.filter(phone = phone, password = pass1)
+        if check_emp:
+            request.session['check_emp'] = phone
+            return redirect('emphome2')
+        else:
+            sms = 'invalid id or password'
+            return render(request, 'emplogin.html', { 'sms' : sms })
+        return render(request, 'emplogin.html')
+
+
+#logout function of admin
 def logout(request):
     try:
         del request.session['check_logged']
+    except:
+        return redirect('index')
+    return redirect('index')
+
+#logout function of employee
+def logout2(request):
+    try:
+        del request.session['check_emp']
     except:
         return redirect('index')
     return redirect('index')

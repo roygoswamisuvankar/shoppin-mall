@@ -2,7 +2,7 @@
 {% load static %}
 <html>
 <head>
-    <title>Admin - Home</title>
+    <title>Admin - Edit</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
@@ -200,7 +200,7 @@ input[type=reset]{
 <div class="header">
   <center>
       <h1>Super Market Management System</h1>
-      <h3>Welcome {{ current_user.name }}</h3>
+      <h3>Admin : {{ current_user.name }}</h3>
   </center>
 </div>
 <!--this is end of header portion-->
@@ -208,40 +208,45 @@ input[type=reset]{
 <div class="row">
     <!--Navigation menu-->
   <div class="col-3 menu">
-    <ul>
+    <!--<ul>
         <li class="active"><a href="{% url 'home' %}">Add new Employee Records</a></li>
         <li><a href="{% url 'showempdetails' %}">Show Employess</a></li>
         <li>Generate Salary Sheet</li>
         <li><a href="{% url 'logout' %}">Logout</a></li>
-    </ul>
+    </ul>-->
+      <ul>
+          <li><a href="{% url 'showempdetails' %}">Cancel</a></li>
+      </ul>
   </div>
     <!--Navigation Menu end -->
     <!--main body content-->
     <div class="col-6">
         <div>
-            <center><h3><u>Employee Entry Form</u></h3></center>
+            <center><h3><u>Employee Update Form</u></h3></center>
             <div style="color : green; font-size : 17px;"><h3>{{ save_data_sms }}</h3></div>
             <div style="color : red; font-size : 17px;"><h3>{{ error }}</h3></div>
             <div class="content">
-                <form action="addemp" method="post" name="myform">
+                <form action="updateemprecord" method="post" name="myform">
                     {% csrf_token %}
+                    <input type="hidden" name="id" value="{{ emp_data.id }}"/>
                     <div class="inp"><i class='fas fa-user-circle'></i>
-                        <input type="text" name="empname" placeholder="Enter employee name" id="in_name" required />
+                        <input type="text" name="empname" placeholder="Enter employee name" id="in_name" value="{{ emp_data.name }}" required />
                         <label id="name" style="color : red; font-size : 17px"><sup>*</sup>Enter valid employee name</label>
                     </div><br/>
                     <div class="inp"><i class='fas fa-phone'></i>
-                        <input type="text" name="empphone" placeholder="Enter employee's contact no." id="in_phone" maxlength="10" required />
+                        <input type="text" name="empphone" placeholder="Enter employee's contact no." id="in_phone" maxlength="10" value="{{ emp_data.phone }}" required />
                         <label id="phone" style="color : red; font-size : 17px"><sup>*</sup>Enter valid employee's contact number</label>
                     </div><br/>
                     <div class="inp"><i class='far fa-envelope'></i>
-                        <input type="email" name="empemail" placeholder="Enter employee email" id="in_email" required />
+                        <input type="email" name="empemail" value="{{ emp_data.email }}" placeholder="Enter employee email" id="in_email" required />
                         <label id="email" style="color : red; font-size : 17px"><sup>*</sup>Enter valid employee's email address</label>
                     </div><br/>
                     <div class="inp"><i class='fa fa-home'></i>
-                        <textarea name="address" required></textarea>
+                        <textarea name="address" required>{{ emp_data.address }}</textarea>
                     </div><br/>
                     <div class="inp"><i class='fas fa-briefcase'></i>
-                        <select name="dept" id="dept">
+                        <!--<select name="dept" id="dept">
+                            <option value="{{ emp_data.dept}}">{{ emp_data.dept }}</option>
                             <option value="Cashier">Cashier</option>
                             <option value="Sales">Sales</option>
                             <option value="Sales Executive">Sales Executive</option>
@@ -257,11 +262,12 @@ input[type=reset]{
                             <option value="Labour">Labour</option>
                             <option value="Security">Security</option>
                             <option value="Shop Kepper">Shop Kepper</option>
-                        </select>
+                        </select>-->
+                        <input type="text" name="dept" value="{{ emp_data.dept }}" required />
                     </div><br/>
-                    <div class="inp"><i class='fa fa-lock'></i>
+                    <!--<div class="inp"><i class='fa fa-lock'></i>
                         <input type="password" name="password" placeholder="Set employee password" required />
-                    </div><br/>
+                    </div>--><br/>
                     <div>
                         <input type="submit" name="submit" value="Save" id="save"/>
                         <input type="reset" value="Reset" name="reset" id="reset"/>

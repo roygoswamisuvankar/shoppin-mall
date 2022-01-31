@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    <title>Employee - Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin : 0;
+  padding : 0;
+}
+
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+[class*="col-"] {
+  float: left;
+  padding: 15px;
+}
+
+html {
+  font-family: "Lucida Sans", sans-serif;
+}
+
+.header {
+  background-color: #9933cc;
+  color: #ffffff;
+  padding: 15px;
+}
+
+.menu ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu li {
+  padding: 8px;
+  margin-bottom: 7px;
+  background-color: #33b5e5;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.menu li:hover {
+  background-color: #0099cc;
+}
+
+.aside {
+  background-color: #33b5e5;
+  padding: 15px;
+  color: #ffffff;
+  text-align: center;
+  font-size: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.footer {
+  background-color: #0099cc;
+  color: #ffffff;
+  text-align: center;
+  font-size: 12px;
+  padding: 15px;
+}
+
+/* For mobile phones: */
+[class*="col-"] {
+  width: 100%;
+}
+
+@media only screen and (min-width: 768px) {
+  /* For desktop: */
+  .col-1 {width: 8.33%;}
+  .col-2 {width: 16.66%;}
+  .col-3 {width: 25%;}
+  .col-4 {width: 33.33%;}
+  .col-5 {width: 41.66%;}
+  .col-6 {width: 50%;}
+  .col-7 {width: 58.33%;}
+  .col-8 {width: 66.66%;}
+  .col-9 {width: 75%;}
+  .col-10 {width: 83.33%;}
+  .col-11 {width: 91.66%;}
+  .col-12 {width: 100%;}
+}
+ul a{
+    text-decoration: none;
+}
+.menu li.active{
+    background-color : #0099cc;
+}
+</style>
+    <!--scripting form validation using jquery-->
+    <script>
+        $(document).ready(function(){
+            $("#name").hide();
+            $("#phone").hide();
+            $("#email").hide();
+
+            /*Employee name validation*/
+            var name = /^[a-zA-Z-,]+(\s{0,1}[a-zA-Z-, ])*$/;
+            $("#in_name").on("input", function(){
+                var inname = $("#in_name").val();
+                if(!inname.match(name) || inname.length <= 4){
+                    $("#name").show();
+                    $("#save").attr("disabled", true);
+                }else{
+                    $("#name").hide();
+                    $("#save").attr("disabled", false);
+                }
+            });
+
+            /*employee phone number validation */
+            var phone = "^[0-9]+$";
+            $("#in_phone").on("input", function(){
+                var inphone = $("#in_phone").val();
+                if(!inphone.match(phone) || inphone.length < 10 ){
+                    $("#phone").show();
+                    $("#save").attr("disabled", true);
+                }else{
+                    $("#phone").hide();
+                    $("#save").attr("disabled", false);
+                }
+            });
+
+            /*email validation */
+            var email = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+            $("#in_email").on("input", function() {
+                var inemail = $("#in_email").val();
+                if(!inemail.match(email) || inemail.length < 6 ){
+                    $("#email").show()
+                    $("#save").attr("disabled", true);
+                }else{
+                    $("#email").hide();
+                    $("#save").attr("disabled", false);
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+
+<!--This is a header portion-->
+<div class="header">
+  <center>
+      <h1>Super Market Management System</h1>
+      <h3>Welcome {{ current_emp.name }}</h3>
+  </center>
+</div>
+<!--this is end of header portion-->
+
+<div class="row">
+    <!--Navigation menu-->
+  <div class="col-3 menu">
+    <ul>
+        <li class="active"><a href="{% url 'emphome2' %}">Add products</a> </li>
+        <li><a href="#">Product Billing</a></li>
+        <li><a href="#">Show Product selling</a></li>
+        <li><a href="#">Generate Report</a></li>
+        <li><a href="#">Your Account Settings</a></li>
+        <li><a href="{% url 'logout2' %}">Logout</a></li>
+    </ul>
+  </div>
+    <!--Navigation Menu end -->
+    <!--main body content-->
+    <div class="col-6">
+        <h3>Add products in stock</h3>
+        <div class="add_form">
+            <form action="#" method="post">
+                <table id="add_form">
+                    <tr>
+                        <td><label>Category : </label></td>
+                        <td>
+                            <select name="category">
+                                <option value="Stationary">Stationary</option>
+                                <option value="Vegetables">Vegetables</option>
+                                <option value="Fruits">Fruits</option>
+                                <option value="Grocery">Grocery</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label>Product Name : </label></td>
+                        <td><input type="text" name="pro_name" placeholder="Product Name" /></td>
+                    </tr>
+                    <tr>
+                        <td><label>Quantity : </label></td>
+                        <td><input type="number" name="qty"/></td>
+                    </tr>
+                    <tr>
+                        <td><label>MRP (Rs): </label></td>
+                        <td><input type="number" name="mrp"/></td>
+                    </tr>
+                    <tr>
+                        <td><label>Unit : </label></td>
+                        <td>
+                            <select name="unit">
+                                <option value="per pice">Per pice</option>
+                                <option value="Kg">Kg</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><input type="submit" value="ADD" name="add"/>&nbsp;<input type="reset" value="Reset" name="reset"/></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div class="col-6">
+        <h3>Products in stocks</h3>
+        <table border="1" id="show_pro">
+            <tr>
+                <th>Product ID</th>
+                <th>Product Category</th>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>MRP(RS)</th>
+                <th>Unit</th>
+            </tr>
+
+        </table>
+    </div>
+    <!--end of main body content-->
+</div>
+</body>
+</html>
