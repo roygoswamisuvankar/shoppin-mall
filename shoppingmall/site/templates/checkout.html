@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+<style>
+* {
+  box-sizing: border-box;
+  margin : 0;
+  padding : 0;
+}
+
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+[class*="col-"] {
+  float: left;
+  padding: 15px;
+}
+
+html {
+  font-family: "Lucida Sans", sans-serif;
+}
+
+.header {
+  background-color: #9933cc;
+  color: #ffffff;
+  padding: 15px;
+}
+
+.menu ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu li {
+  padding: 8px;
+  margin-bottom: 7px;
+  background-color: #33b5e5;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.menu li:hover {
+  background-color: #0099cc;
+}
+
+.aside {
+  background-color: #33b5e5;
+  padding: 15px;
+  color: #ffffff;
+  text-align: center;
+  font-size: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.footer {
+  background-color: #0099cc;
+  color: #ffffff;
+  text-align: center;
+  font-size: 12px;
+  padding: 15px;
+}
+
+/* For mobile phones: */
+[class*="col-"] {
+  width: 100%;
+}
+
+@media only screen and (min-width: 768px) {
+  /* For desktop: */
+  .col-1 {width: 8.33%;}
+  .col-2 {width: 16.66%;}
+  .col-3 {width: 25%;}
+  .col-4 {width: 33.33%;}
+  .col-5 {width: 41.66%;}
+  .col-6 {width: 50%;}
+  .col-7 {width: 58.33%;}
+  .col-8 {width: 66.66%;}
+  .col-9 {width: 75%;}
+  .col-10 {width: 83.33%;}
+  .col-11 {width: 91.66%;}
+  .col-12 {width: 100%;}
+}
+ul a{
+    text-decoration: none;
+}
+.menu li.active{
+    background-color : #0099cc;
+}
+</style>
+</head>
+<body>
+
+<!--This is a header portion-->
+<div class="header">
+  <center>
+      <h1>Super Market Management System</h1>
+      <h3>Employee : {{ current_emp.name }}</h3>
+  </center>
+</div>
+<!--this is end of header portion-->
+<div class="row">
+        <h2 style="color : red;">Please donot click on refresh or back button before you get invoice bill, please click on print button first then click on 'Get Invoice' button, Make sure that the order does not cancel at this stage</h2>
+</div>
+<div class="row">
+    <!--Navigation menu-->
+    <!--Navigation Menu end -->
+    <!--main body content-->
+    <div style="" id="printarea">
+        <div style="position:absolute; top : 30%; width : 100%; padding : 5px 5px 5px 5px;">
+            <hr style="border : 1px solid black;"></hr>
+            <div style="border : 2px solid black;">
+                {% if data %}
+                <center>
+                    <h3>Super Market</h3>
+                </center>
+                <hr style="border : 1px solid black;"></hr>
+                <form action="get_invoice" method="post">
+                    {% csrf_token %}
+                    <table border="1">
+                        <tr>
+                            <td colspan="2">
+                                Dankuni T.N. Mukherjee Road</br>
+                                Near Dankuni Khelar Math</br>
+                                Beside Dankuni Post Office - 712311</br>
+                                Email - supermarket@gmail.com</br>
+                                Phone - 9748836183
+                            </td>
+                            <th colspan="3">
+                                <h3>INVOICE</h3>
+                            </th>
+                            <td colspan="2">
+                                <table>
+                                    <tr>
+                                        <td><b>Customer Name : </b></td>
+                                        <td><input type="text" name="cus_name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><b>Email Address : </b></td>
+                                        <td><input type="email" name="email"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><b>Phone Number : </b></td>
+                                        <td><input type="phone" name="phone"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><b>Invoice Number : </b></td>
+                                        <td><input type="text" value="{{ inv }}" name="inv_no" readonly style="border : none; outline: none;"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><b>Date : </b></td>
+                                        <td><input type="text" name="date" value="{{ date }}" readonly style="border : none; outline : none;"/></td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Product Category</th>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>MRP(rs)</th>
+                            <th>Unit</th>
+                            <th>Discount(rs)</th>
+                            <th>Amount(rs)</th>
+                        </tr>
+                        {% for i in data %}
+                        <tr>
+                            <td><input type="text" value="{{ i.category }}" name="category" readonly style="border : none; outline : none; width : 65%;"/></td>
+                            <td><input type="text" value="{{ i.pro_name }}" name="pro_name" readonly style="border : none; outline : none; width : 65%;"/></td>
+                            <td><input type="number" value="{{ i.qty }}" name="qty" readonly style="border : none; outline : none; width : 25%;" /></td>
+                            <td>Rs.<input type="number" value="{{ i.mrp }}" name="mrp" readonly style="border : none; outline : none; width : 45%;"/>/-</td>
+                            <td><input type="text" value="{{ i.unit }}" name="unit" readonly style="border : none; outline : none; width : 35%;"/></td>
+                            <td><input type="number" value="{{ i.discount }}" name="discount" readonly style="border : none; outline : none; width : 35%;"/>%</td>
+                            <td>Rs.<input type="number" value="{{ i.amount }}" name="amount" readonly style="border : none; outline : none;width : 45%;" />/-</td>
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                            <td colspan=""><b>GST : </b></td>
+                            <td colspan="">18%</td>
+                            <td><b>GST Amount : </b></td>
+                            <td>Rs.{{ gst }}/-</td>
+                            <td colspan="2"><b>Total Amount : </b></td>
+                            <td>Rs.<input type="number" value="{{ gtotal }}" name="gtotal" readonly style="border : none; outline : none;width : 45%;"/>/-</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><b>Rs. in word : </b></td>
+                            <td colspan="5"><b>{{ rsw }} only</b></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><b>Mode of Payment : </b></td>
+                            <td colspan="2">
+                                <select name="mod">
+                                    <option value="UPI">UPI</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Debit Card">Debit Card</option>
+                                    <option value="Credit Card">Credit Card</option>
+                                </select>
+                            </td>
+                            <td><b>Sold By : </b></td>
+                            <td colspan="2"><input type="hidden" name="emp_id" value="{{ current_emp.id }}"/>
+                            <input type="text" value="{{ current_emp.name }}" name="emp_name" readonly style="border : none; outline : none;"/></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                Goods once sold will not taken back or exchange,</br>
+                                Please count your goods and money after leaving counter,</br>
+                                Thank you for shopping from us, please visit again.
+                            </td>
+                            <td colspan="2" style="text-align : center;">
+                                <input type="checkbox" name="check" id="check" required/>I am confirm of above information
+                            </td>
+                            <td colspan="2" style="text-align : center;">
+                                <button type="button" name="print" id="print">Print</button>
+                                <input type="submit" name="submit" value="Get Invoice" id="invoice"/>
+                            </td>
+                            <script type="text/javascript">
+                                $(document).ready(function(){
+                                    $("#invoice").hide();
+                                    $("#check").hide()
+
+                                    function printData()
+                                    {
+                                       var divToPrint=document.getElementById("printarea");
+                                       newWin= window.open("");
+                                       newWin.document.write(divToPrint.outerHTML);
+                                       newWin.print();
+                                       newWin.close();
+                                    }
+
+                                    $('#print').on('click',function(){
+                                        printData();
+                                        $("#invoice").show();
+                                        $("#print").hide();
+                                        $("#check").show();
+                                    })
+                                });
+                            </script>
+                        </tr>
+                    </table>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <!--end of main body content-->
+</div>
+</body>
+</html>

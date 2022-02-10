@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src='https://kit.fontawesome.com/a076d05399.js'></script>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <style>
 * {
   box-sizing: border-box;
@@ -100,48 +100,14 @@ ul a{
 </style>
     <!--scripting form validation using jquery-->
     <script>
-        $(document).ready(function(){
-            $("#name").hide();
-            $("#phone").hide();
-            $("#email").hide();
+        $(document).ready(function() {
+            var $optgroups = $('#subcategory > #B');
 
-            /*Employee name validation*/
-            var name = /^[a-zA-Z-,]+(\s{0,1}[a-zA-Z-, ])*$/;
-            $("#in_name").on("input", function(){
-                var inname = $("#in_name").val();
-                if(!inname.match(name) || inname.length <= 4){
-                    $("#name").show();
-                    $("#save").attr("disabled", true);
-                }else{
-                    $("#name").hide();
-                    $("#save").attr("disabled", false);
-                }
-            });
+            $("#category").on('change', function(){
+                var selectedVal = this.value;
 
-            /*employee phone number validation */
-            var phone = "^[0-9]+$";
-            $("#in_phone").on("input", function(){
-                var inphone = $("#in_phone").val();
-                if(!inphone.match(phone) || inphone.length < 10 ){
-                    $("#phone").show();
-                    $("#save").attr("disabled", true);
-                }else{
-                    $("#phone").hide();
-                    $("#save").attr("disabled", false);
-                }
-            });
+                $("#subcategory").html($optgroups.filter('[label="' + selectedVal + '"]'));
 
-            /*email validation */
-            var email = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-            $("#in_email").on("input", function() {
-                var inemail = $("#in_email").val();
-                if(!inemail.match(email) || inemail.length < 6 ){
-                    $("#email").show()
-                    $("#save").attr("disabled", true);
-                }else{
-                    $("#email").hide();
-                    $("#save").attr("disabled", false);
-                }
             });
         });
     </script>
@@ -162,7 +128,9 @@ ul a{
   <div class="col-3 menu">
     <ul>
         <li class="active"><a href="{% url 'emphome2' %}">Add products</a> </li>
-        <li><a href="#">Product Billing</a></li>
+        <li><a href="{% url 'show_in_stocks' %}">Show Available Products in stocks</a></li>
+        <li><a href="{% url 'updateproducts' %}">Updates products</a></li>
+        <li><a href="{% url 'productbill' %}">Product Billing</a></li>
         <li><a href="#">Show Product selling</a></li>
         <li><a href="#">Generate Report</a></li>
         <li><a href="#">Your Account Settings</a></li>
@@ -173,13 +141,15 @@ ul a{
     <!--main body content-->
     <div class="col-6">
         <h3>Add products in stock</h3>
+        <h3 style="color : green;">{{ sms }}</h3>
         <div class="add_form">
-            <form action="#" method="post">
+            <form action="addproducts" method="post">
+                {% csrf_token %}
                 <table id="add_form">
                     <tr>
                         <td><label>Category : </label></td>
                         <td>
-                            <select name="category">
+                            <select name="category" id="category">
                                 <option value="Stationary">Stationary</option>
                                 <option value="Vegetables">Vegetables</option>
                                 <option value="Fruits">Fruits</option>
@@ -189,22 +159,38 @@ ul a{
                     </tr>
                     <tr>
                         <td><label>Product Name : </label></td>
-                        <td><input type="text" name="pro_name" placeholder="Product Name" /></td>
+                        <td><input type="text" name="pro_name" placeholder="Enter product"/></td>
                     </tr>
                     <tr>
                         <td><label>Quantity : </label></td>
-                        <td><input type="number" name="qty"/></td>
+                        <td><input type="number" name="qty" required/></td>
                     </tr>
                     <tr>
                         <td><label>MRP (Rs): </label></td>
-                        <td><input type="number" name="mrp"/></td>
+                        <td><input type="number" name="mrp" required/></td>
+                    </tr>
+                     <tr>
+                        <td><label>Discount (Rs): </label></td>
+                        <td><input type="number" name="discount" value="0" required/></td>
                     </tr>
                     <tr>
                         <td><label>Unit : </label></td>
                         <td>
-                            <select name="unit">
-                                <option value="per pice">Per pice</option>
-                                <option value="Kg">Kg</option>
+                            <select name="unit" id="subcategory">
+                                <optgroup label="Stationary" id="B">
+                                    <option value="Per Pice">Per Pice</option>
+                                </optgroup>
+                                <optgroup label="Grocery" id="B">
+                                    <option value="Per Pice">Per Pice</option>
+                                    <option value="Liter">Liter</option>
+                                    <option value="Kg">Kg</option>
+                                </optgroup>
+                                <optgroup label="Vegetables" id="B">
+                                    <option value="Kg">Kg</option>
+                                </optgroup>
+                                <optgroup label="Fruits" id="B">
+                                    <option value="Kg">Kg</option>
+                                </optgroup>
                             </select>
                         </td>
                     </tr>
@@ -215,18 +201,60 @@ ul a{
             </form>
         </div>
     </div>
+    <div>
+        <div>
+            <h3>Our available products</h3>
+            <table border="1">
+                <tr>
+                    <th>SL. NO.</th>
+                    <th>Products</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Grocery</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Vegetables</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Stationary</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Fruits</td>
+                </tr>
+            </table>
+        </div>
+    </div>
     <div class="col-6">
-        <h3>Products in stocks</h3>
+        <h3>Products in stocks</h3><label style="color : red;">[<sup>*</sup>incase any wrong input, please click on update products options to correct your input]</label>
         <table border="1" id="show_pro">
             <tr>
                 <th>Product ID</th>
                 <th>Product Category</th>
                 <th>Product Name</th>
                 <th>Quantity</th>
-                <th>MRP(RS)</th>
                 <th>Unit</th>
+                <th>MRP(RS) per KG/pice/liter</th>
+                <th>Discount(RS)</th>
+                <th>Date</th>
+                <th>Edit Item</th>
             </tr>
-
+            {% for i in data %}
+            <tr>
+                <td>{{ i.id }}</td>
+                <td>{{ i.category }}</td>
+                <td>{{ i.pro_name }}</td>
+                <td>{{ i.qty }}</td>
+                <td>{{ i.unit }}</td>
+                <td>Rs.{{ i.mrp }}/-</td>
+                <td>{{ i.discount }}%</td>
+                <td>{{ i.date }} - {{ date }}</td>
+                <td><a href="editproducts/{{ i.id }}">Edit</a></td>
+            </tr>
+            {% endfor %}
         </table>
     </div>
     <!--end of main body content-->
