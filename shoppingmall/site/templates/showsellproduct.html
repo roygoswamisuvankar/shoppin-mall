@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/css/select2.min.css" rel="stylesheet" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/js/select2.min.js"></script>
+    <style>
+* {
+  box-sizing: border-box;
+  margin : 0;
+  padding : 0;
+}
+
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+[class*="col-"] {
+  float: left;
+  padding: 15px;
+}
+
+html {
+  font-family: "Lucida Sans", sans-serif;
+}
+
+.header {
+  background-color: #9933cc;
+  color: #ffffff;
+  padding: 15px;
+}
+
+.menu ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu li {
+  padding: 8px;
+  margin-bottom: 7px;
+  background-color: #33b5e5;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.menu li:hover {
+  background-color: #0099cc;
+}
+
+.aside {
+  background-color: #33b5e5;
+  padding: 15px;
+  color: #ffffff;
+  text-align: center;
+  font-size: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.footer {
+  background-color: #0099cc;
+  color: #ffffff;
+  text-align: center;
+  font-size: 12px;
+  padding: 15px;
+}
+
+/* For mobile phones: */
+[class*="col-"] {
+  width: 100%;
+}
+
+@media only screen and (min-width: 768px) {
+  /* For desktop: */
+  .col-1 {width: 8.33%;}
+  .col-2 {width: 16.66%;}
+  .col-3 {width: 25%;}
+  .col-4 {width: 33.33%;}
+  .col-5 {width: 41.66%;}
+  .col-6 {width: 50%;}
+  .col-7 {width: 58.33%;}
+  .col-8 {width: 66.66%;}
+  .col-9 {width: 75%;}
+  .col-10 {width: 83.33%;}
+  .col-11 {width: 91.66%;}
+  .col-12 {width: 100%;}
+}
+ul a{
+    text-decoration: none;
+}
+.menu li.active{
+    background-color : #0099cc;
+}
+</style>
+    <script>
+        $(document).ready(function() {
+				var productname = ["","NoteBook", "LongBook", "Gel Pen Green", "Pencil", "Tomato", "Potato", "Mastard Oil", "Sunflower Oil",
+				"oranges", "mango", "banana", "apple", "grapes"
+
+				];
+				$("#name").select2({
+				  data: productname
+				});
+			});
+
+
+    </script>
+</head>
+<body>
+
+<!--This is a header portion-->
+<div class="header">
+  <center>
+      <h1>Super Market Management System</h1>
+      <h3>Employee : {{ current_emp.name }}</h3>
+  </center>
+</div>
+<!--this is end of header portion-->
+
+<div class="row">
+    <!--Navigation menu-->
+  <div class="col-3 menu">
+    <ul>
+        <li><a href="{% url 'emphome2' %}">Add products</a> </li>
+        <li><a href="{% url 'show_in_stocks' %}">Show Available products in stocks</a></li>
+        <li><a href="{% url 'updateproducts' %}">Updates products</a></li>
+        <li><a href="{% url 'productbill' %}">Product Billing</a></li>
+        <li class="active"><a href="{% url 'productselling' %}">Show Product Selling</a></li>
+        <li><a href="{% url 'ac_settings' %}">Your Account Settings</a></li>
+        <li><a href="{% url 'logout2' %}">Logout</a></li>
+    </ul>
+  </div>
+    <!--Navigation Menu end -->
+    <!--main body content-->
+    <div class="col-6">
+        <div>
+            <form action="searchproducts3" method="post">
+                {% csrf_token %}
+                <table>
+                    <tr>
+                        <td>Product Name</td>
+                        <td>Date</td>
+                        <td>Invoice Number</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <select id="name" style="width:300px;"  name="pro_name">
+			                    <!-- Dropdown List Option -->
+			                </select>
+                        </td>
+                        <td>
+                            <input type="date" format="Y-m-d" value="2015-07-01" name="date" />
+                        </td>
+                        <td>
+                            <input type="text" name="inv_no" placeholder="Invoice Number"/>
+                        </td>
+                        <td>
+                            <input type="submit" value="search" name="search"/>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+            <style>
+               input[type=submit]{
+                        border : green;
+                        background-color : green;
+                        color : white;
+                        border-radius : 2px;
+                        cursor : pointer;
+                        padding : 5px 8px;
+                    }
+            </style>
+        </div>
+    </div>
+    <div class="col-6">
+        <label style="color : red">{{ sms }}</label>
+        {% if data %}
+        <table border="1" id="sell">
+            <tr>
+                <th>Sell ID</th>
+                <th>Category</th>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>MRP(rs)</th>
+                <th>unit</th>
+                <th>Discount</th>
+                <th>Amount(rs)</th>
+                <th>Date</th>
+                <th>Invoice Number</th>
+                <th>Mode Of Payment</th>
+            </tr>
+            {% for i in data %}
+                <tr>
+                    <td>{{ i.id }}</td>
+                    <td>{{ i.category }}</td>
+                    <td>{{ i.pro_name }}</td>
+                    <td>{{ i.qty }}</td>
+                    <td>Rs.{{ i.mrp }}/-</td>
+                    <td>{{ i.unit }}</td>
+                    <td>{{ i.discount }}</td>
+                    <td>Rs.{{ i.amount }}/-</td>
+                    <td>{{ i.date }}</td>
+                    <td>{{ i.inv_no }}</td>
+                    <td>{{ i.mod }}</td>
+                </tr>
+            {% endfor %}
+
+                {% for j in invdata %}
+                <tr>
+                    <td colspan="2">Gst : </td>
+                    <td>18%</td>
+                    <td></td>
+                    <td colspan="3"><b>Total Sell Amount(Rs)</b></td>
+                    <td>Rs.{{ j.gtotal }}/-</td>
+                    <td colspan="3"><b>Sold By : </b>{{ j.emp_name }}</td>
+                </tr>
+                {% endfor %}
+                {% if cus_data %}
+                <tr>
+                    <th colspan="11"><b>Customer's Details</b></th>
+                </tr>
+                {% for k in cus_data %}
+                <tr>
+                    <td colspan="2"><b>Name</b></td>
+                    <td colspan="2">{{ k.cus_name }}</td>
+                    <td colspan=""><b>Email</b></td>
+                    <td colspan="3">{{ k.email }}</td>
+                    <td colspan=""><b>Phone</b></td>
+                    <td colspan="2">{{ k.phone }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+
+        </table>
+        {% endif %}
+        <style type="text/css">
+            #sell{
+                padding : 5px 8px;
+                border-collapse: collapse;
+            }
+            #sell th{
+                background-color : lightgray;
+                color : white;
+                padding : 5px 8px;
+            }
+            #sell td{
+                padding : 5px 8px;
+            }
+            #sell tr:nth-child(odd){
+                background-color : #f1f1f1;
+            }
+            #detail1, #detail2{
+                color : green;
+                text-decoration : none;
+            }
+        </style>
+    </div>
+    <!--end of main body content-->
+</div>
+</body>
+</html>

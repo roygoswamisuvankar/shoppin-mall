@@ -8,6 +8,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <script src='https://kit.fontawesome.com/a076d05399.js'></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
 * {
   box-sizing: border-box;
@@ -131,9 +132,8 @@ ul a{
         <li><a href="{% url 'show_in_stocks' %}">Show Available Products in stocks</a></li>
         <li><a href="{% url 'updateproducts' %}">Updates products</a></li>
         <li><a href="{% url 'productbill' %}">Product Billing</a></li>
-        <li><a href="#">Show Product selling</a></li>
-        <li><a href="#">Generate Report</a></li>
-        <li><a href="#">Your Account Settings</a></li>
+        <li><a href="{% url 'productselling' %}">Show Product Selling</a></li>
+        <li><a href="{% url 'ac_settings' %}">Your Account Settings</a></li>
         <li><a href="{% url 'logout2' %}">Logout</a></li>
     </ul>
   </div>
@@ -159,7 +159,7 @@ ul a{
                     </tr>
                     <tr>
                         <td><label>Product Name : </label></td>
-                        <td><input type="text" name="pro_name" placeholder="Enter product"/></td>
+                        <td><input type="text" name="pro_name" placeholder="Enter product" required/></td>
                     </tr>
                     <tr>
                         <td><label>Quantity : </label></td>
@@ -198,13 +198,40 @@ ul a{
                         <td colspan="2"><input type="submit" value="ADD" name="add"/>&nbsp;<input type="reset" value="Reset" name="reset"/></td>
                     </tr>
                 </table>
+                <style type="text/css">
+                    input[type=submit]{
+                        background-color : green;
+                        color : white;
+                        border : green;
+                        cursor : pointer;
+                        padding : 5px 8px;
+                        border-radius : 2px;
+                    }
+                    input[type=reset]{
+                        background-color : red;
+                        color : white;
+                        border : red;
+                        cursor : pointer;
+                        padding : 5px 8px;
+                        border-radius : 2px;
+                    }
+                    label{
+                        font-weight : bold;
+                    }
+                    input[type=text], [type=number], select{
+                        padding : 5px 8px;
+                        border-radius : 2px;
+                        border : 1px solid lightgray;
+                        outline-color : grey;
+                    }
+                </style>
             </form>
         </div>
     </div>
     <div>
         <div>
             <h3>Our available products</h3>
-            <table border="1">
+            <table border="1" id="available">
                 <tr>
                     <th>SL. NO.</th>
                     <th>Products</th>
@@ -226,9 +253,24 @@ ul a{
                     <td>Fruits</td>
                 </tr>
             </table>
+            <style type="text/css">
+                #available{
+                    padding : 5px 8px;
+                    border-collapse : collapse;
+                }
+                #available th{
+                    padding : 5px 8px;
+                    color : white;
+                    background-color : #BDBDBD;
+                }
+                #available td{
+                    padding : 5px 8px;
+                }
+            </style>
         </div>
     </div>
     <div class="col-6">
+        {% if data %}
         <h3>Products in stocks</h3><label style="color : red;">[<sup>*</sup>incase any wrong input, please click on update products options to correct your input]</label>
         <table border="1" id="show_pro">
             <tr>
@@ -252,10 +294,28 @@ ul a{
                 <td>Rs.{{ i.mrp }}/-</td>
                 <td>{{ i.discount }}%</td>
                 <td>{{ i.date }} - {{ date }}</td>
-                <td><a href="editproducts/{{ i.id }}">Edit</a></td>
+                <td><a href="editproducts/{{ i.id }}"><i class="fa fa-edit" style="color : green;">Edit</i></a></td>
             </tr>
             {% endfor %}
         </table>
+        {% endif %}
+        <style type="text/css">
+            #show_pro{
+                padding : 5px 8px;
+                border-collapse : collapse;
+            }
+            #show_pro th{
+                    padding : 5px 8px;
+                    color : white;
+                    background-color : #BDBDBD;
+            }
+            #show_pro td{
+                   padding : 5px 8px;
+            }
+            #show_pro tr:nth-child(odd){
+                background-color : lightgray;
+            }
+        </style>
     </div>
     <!--end of main body content-->
 </div>

@@ -116,9 +116,8 @@ ul a{
         <li class="active"><a href="{% url 'show_in_stocks' %}">Show Available Products in stocks</a></li>
         <li><a href="{% url 'updateproducts' %}">Updates products</a></li>
         <li><a href="{% url 'productbill' %}">Product Billing</a></li>
-        <li><a href="#">Show Product selling</a></li>
-        <li><a href="#">Generate Report</a></li>
-        <li><a href="#">Your Account Settings</a></li>
+        <li><a href="{% url 'productselling' %}">Show Product Selling</a></li>
+        <li><a href="{% url 'ac_settings' %}">Your Account Settings</a></li>
         <li><a href="{% url 'logout2' %}">Logout</a></li>
     </ul>
   </div>
@@ -130,7 +129,7 @@ ul a{
             {% csrf_token %}
             <table>
                 <tr>
-                    <td>Product Category : </td>
+                    <td><label>Product Category : </label></td>
                     <td>
                         <select name="category">
                             <option value="Stationary">Stationary</option>
@@ -143,11 +142,30 @@ ul a{
                 </tr>
             </table>
         </form>
+        <style type="text/css">
+            select{
+                padding : 8px 8px;
+                border-radius : 2px;
+                border : 1px solid lightgray;
+                outline-color : grey;
+            }
+            input[type=submit]{
+                border : green;
+                background-color : green;
+                color : white;
+                border-radius : 2px;
+                cursor : pointer;
+                padding : 5px 8px;
+            }
+            label{
+                font-weight : bold;
+            }
+        </style>
         <h3 style="color : red;">{{ sms1 }}{{ date }}</h3>
 
         {% if data %}
         <h3 style="color : green;">{{ sms }}{{ date }}</h3>
-        <table border="1">
+        <table border="1" id="available">
             <tr>
                 <th>Product ID</th>
                 <th>Category</th>
@@ -172,6 +190,23 @@ ul a{
             {% endfor %}
         </table>
         {% endif %}
+        <style type="text/css">
+            #available{
+                    padding : 5px 8px;
+                    border-collapse : collapse;
+                }
+                #available th{
+                    padding : 5px 8px;
+                    color : white;
+                    background-color : #BDBDBD;
+                }
+                #available td{
+                    padding : 5px 8px;
+                }
+                #available tr:nth-child(odd){
+                background-color : #f1f1f1;
+            }
+        </style>
     </div>
     <!--end of main body content-->
 </div>

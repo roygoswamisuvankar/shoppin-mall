@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - Home</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+<style>
+* {
+  box-sizing: border-box;
+  margin : 0;
+  padding : 0;
+}
+
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+[class*="col-"] {
+  float: left;
+  padding: 15px;
+}
+
+html {
+  font-family: "Lucida Sans", sans-serif;
+}
+
+.header {
+  background-color: #9933cc;
+  color: #ffffff;
+  padding: 15px;
+}
+
+.menu ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu li {
+  padding: 8px;
+  margin-bottom: 7px;
+  background-color: #33b5e5;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.menu li:hover {
+  background-color: #0099cc;
+}
+
+.aside {
+  background-color: #33b5e5;
+  padding: 15px;
+  color: #ffffff;
+  text-align: center;
+  font-size: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.footer {
+  background-color: #0099cc;
+  color: #ffffff;
+  text-align: center;
+  font-size: 12px;
+  padding: 15px;
+}
+
+/* For mobile phones: */
+[class*="col-"] {
+  width: 100%;
+}
+
+@media only screen and (min-width: 768px) {
+  /* For desktop: */
+  .col-1 {width: 8.33%;}
+  .col-2 {width: 16.66%;}
+  .col-3 {width: 25%;}
+  .col-4 {width: 33.33%;}
+  .col-5 {width: 41.66%;}
+  .col-6 {width: 50%;}
+  .col-7 {width: 58.33%;}
+  .col-8 {width: 66.66%;}
+  .col-9 {width: 75%;}
+  .col-10 {width: 83.33%;}
+  .col-11 {width: 91.66%;}
+  .col-12 {width: 100%;}
+}
+ul a{
+    text-decoration: none;
+}
+.menu li.active{
+    background-color : #0099cc;
+}
+</style>
+</head>
+<body>
+
+<!--This is a header portion-->
+<div class="header">
+  <center>
+      <h1>Super Market Management System</h1>
+      <h3>Employee : {{ current_emp.name }}</h3>
+  </center>
+</div>
+<!--this is end of header portion-->
+
+<div class="row">
+    <!--Navigation menu-->
+  <div class="col-3 menu">
+    <ul>
+        <li><a href="{% url 'showbankdetails' %}">Cancel</a></li>
+    </ul>
+  </div>
+    <!--Navigation Menu end -->
+    <!--main body content-->
+    <div class="col-6">
+        <h4>Edit Your Bank-Details</h4>
+        <h5 style="color : red;">{{ sms }}</h5>
+        <form action="update_bank_details" method="post">
+            {% csrf_token %}
+            <table id="show_bank_detials">
+                <tr>
+                    <td><b>Employee ID</b></td>
+                    <td><b>:</b></td>
+                    <td><input type="number" value="{{ bank_data.emp_id }}" name="emp_id" id="emp_id" readonly/></td>
+                    <td><b>Employee Name</b></td>
+                    <td><b>:</b></td>
+                    <td><input type="text" name="emp_name" value="{{ bank_data.emp_name }}" id="emp_name" readonly/></td>
+                </tr>
+                <tr>
+                    <td><b>Contact Number</b></td>
+                    <td><b>:</b></td>
+                    <td><input type="text" name="emp_phone" value="{{ bank_data.emp_phone }}" /></td>
+                    <td><b>Bank-Name</b></td>
+                    <td><b>:</b></td>
+                    <td><input type="text" name="bank_name" value="{{ bank_data.bank_name }}"/></td>
+                </tr>
+                <tr>
+                    <td><b>Bank-Branch</b></td>
+                    <td><b>:</b></td>
+                    <td><input type="text" value="{{ bank_data.branch }}" name="branch" /></td>
+                    <td><b>IFC-Code</b></td>
+                    <td><b>:</b></td>
+                    <td><input type="text" value="{{ bank_data.ifc }}" name="ifc"/></td>
+                </tr>
+                <tr>
+                    <td><b>Account-Type</b></td>
+                    <td><b>:</b></td>
+                    <td><input type="text" value="{{ bank_data.ac_type }}" name="ac_type"/></td>
+                    <td><b>Account-Number</b></td>
+                    <td><b>:</b></td>
+                    <td><input type="number" value="{{ bank_data.ac_number }}" name="ac_number"/></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="submit" value="Update" /></td>
+                </tr>
+            </table>
+        </form>
+        <style>
+            #show_bank_detials td{
+                padding : 5px;
+            }
+            input[type="text"], input[type="number"]{
+                padding : 5px;
+                border : 1px solid lightgray;
+                outline : none;
+            }
+            #emp_id, #emp_name {
+                color : black;
+                background-color: lightgray;
+            }
+            input[type=submit]{
+                padding : 5px 8px;
+                border : none;
+                border-radius : 2px;
+                background-color : green;
+                color : white;
+                font-weight : bold;
+                cursor : pointer;
+            }
+        </style>
+    </div>
+    <!--end of main body content-->
+</div>
+</body>
+</html>

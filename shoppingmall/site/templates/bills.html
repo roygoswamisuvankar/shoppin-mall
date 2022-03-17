@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>INVOICE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js" type="text/javascript"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/css/select2.min.css" rel="stylesheet" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/js/select2.min.js"></script>
+</head>
+<body id="printTable">
+    <u><h1>Super Market</h1></u>
+    <u><h3>INVOICE</h3></u>
+    <b>Invoice Number : </b>{% for j in invdata %} {{ j.inv_no }} {% endfor %},&nbsp;
+    <b>Date : </b>{% for j in invdata %} {{ j.date }} {% endfor %}, &nbsp;
+    <h3>Customer Details</h3>
+    ...................................................................................
+    <table>
+        <tr>
+            <td>Name : </td>
+            <td>
+                {% for cus in cus_data %} {{ cus.cus_name }} {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>Email : </td>
+            <td>{% for cus in cus_data %} {{ cus.email }} {% endfor %}</td>
+        </tr>
+        <tr>
+            <td>Phone : </td>
+            <td>{% for cus in cus_data %} {{ cus.phone }} {% endfor %}</td>
+        </tr>
+    </table>
+    <h3>Items</h3>
+    ..................................................................
+    <table>
+        <tr>
+            <th>Category</th>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>MRP(rs)</th>
+            <th>Unit</th>
+            <th>Discount(rs)</th>
+            <th>Amount(rs)</th>
+        </tr>
+        {% for i in data %}
+        <tr>
+            <td>{{ i.category }}</td>
+            <td>{{ i.pro_name }}</td>
+            <td>{{ i.qty }}</td>
+            <td>Rs.{{ i.mrp }}/-</td>
+            <td>{{ i.unit }}</td>
+            <td>{{ i.discount }}%</td>
+            <td>Rs.{{ i.amount }}/-</td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="">Gst : </td>
+            <td colspan="">18%</td>
+            <td colspan=""></td>
+            <td colspan=""></td>
+            <td colspan="2">Total Amount : </td>
+            <td colspan="2">Rs.{% for j in invdata %} {{ j.gtotal }} {% endfor %}/-</td>
+        </tr>
+
+    </table>
+     {{ cus.gtotal }}
+    .................................................................................</br>
+    <b>Sold By : </b>{% for j in invdata %} {{ j.emp_name }} {% endfor %}<br>
+    .......................................................................</br>
+    <label>
+        ****************Thank You*****************
+        <div>
+            Super Market<br>
+            T.N Mukherjee Road beside Dankuni Post Office
+            <br>Hooghly West Bengal 712311<br>
+            Email : supermarket@gmail.com
+            <br>Phone : 9748836183
+        </div>
+    </label>
+    <button>Print Invoice</button>
+    <a href="{% url 'searchproducts' %}">Back</a>
+<script>
+    function printData()
+{
+   var divToPrint=document.getElementById("printTable");
+   newWin= window.open("");
+   newWin.document.write(divToPrint.outerHTML);
+   newWin.print();
+   newWin.close();
+}
+
+$('button').on('click',function(){
+printData();
+$('button').hide();
+
+})
+</script>
+</body>
+</html>

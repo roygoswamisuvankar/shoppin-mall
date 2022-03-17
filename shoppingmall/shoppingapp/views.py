@@ -1,12 +1,15 @@
 import string
 import random
 from django.shortcuts import render, redirect
+from django.db.models import Q
 from django.http import HttpResponse
 from django.db import connection
-from .models import admin2, employee2, products, add_products, customers_sells, sells_items, invoice_data
+from .models import admin2, employee2, products, add_products, customers_sells, sells_items, invoice_data, bank_ac
 import hashlib
 from datetime import date
 from num2words import num2words
+from .utils import get_plot, get_bar_plot, simplegraph, highsell
+import re
 
 #main portion of project
 
@@ -121,6 +124,103 @@ def updateemprecord(request):
             return redirect('showempdetails')
         #return render(request, 'adminhome.html', { 'current_user ' : current_user })
     return render(request, 'index.html')
+
+def generate_report(request):
+    if 'check_logged' in request.session:
+        current_user = request.session['check_logged']
+        data = admin2.objects.get(phone = current_user)
+        param = {
+            'current_user': data,
+        }
+        return render(request, 'generatereport.html', param)
+    return redirect('index')
+
+def showsell2(request):
+    if 'check_logged' in request.session:
+        current_user = request.session['check_logged']
+        data = admin2.objects.get(phone = current_user)
+        if request.method == 'POST':
+            category = request.POST.get('category')
+            pro_name = request.POST.get('pro_name')
+            date = request.POST.get('date')
+            fetch_data = sells_items.objects.filter(Q(pro_name = pro_name) | Q(date = date) | Q(category = category))
+            if fetch_data:
+                for i in fetch_data:
+                    date1 = i.date
+                x = [x.pro_name for x in fetch_data]
+                y = [y.qty for y in fetch_data]
+                chart = get_plot(x,y)
+                param = {
+                    'current_user': data,
+                    'fetch_data': fetch_data,
+                    'chart': chart,
+                    'Date' : date1,
+                }
+                return render(request, 'generatereport.html', param)
+            else:
+                sms = 'No Data Found!'
+                param = {
+                    'current_user': data,
+                    'sms' : sms,
+                }
+                return render(request, 'generatereport.html', param)
+        return render(request, 'generatereport.html', { 'current_user' : data })
+    return redirect('index')
+
+#show today stock
+def showtodaystock(request):
+    if 'check_logged' in request.session:
+        current_user = request.session['check_logged']
+        data = admin2.objects.get(phone = current_user)
+        date1 = date.today()
+        fetch_stock = products.objects.all()
+        x = [x.pro_name for x in fetch_stock]
+        y = [y.qty for y in fetch_stock]
+        chart = get_bar_plot(x, y)
+        param = {
+            'current_user': data,
+            'fetch_stock': fetch_stock,
+            'chart': chart,
+            'Date1': date1,
+        }
+        return render(request, 'generatereport.html', param)
+    return redirect('index')
+
+#show overall sales,
+def overallsales(request):
+    if 'check_logged' in request.session:
+        current_user = request.session['check_logged']
+        data = admin2.objects.get(phone = current_user)
+        sells_stock = sells_items.objects.all()
+        x = [x.date for x in sells_stock]
+        y = [y.pro_name for y in sells_stock]
+        chart = simplegraph(x, y)
+        param = {
+            'current_user': data,
+            'chart': chart,
+            'sells_stock' : sells_stock,
+        }
+        return render(request, 'generatereport.html', param)
+    return redirect('index')
+
+#show highly product sells,
+def highsells(request):
+    if 'check_logged' in request.session:
+        current_user = request.session['check_logged']
+        data = admin2.objects.get(phone = current_user)
+        sells_stock = sells_items.objects.all()
+        x = [x.pro_name for x in sells_stock]
+        chart = highsell(x)
+        param = {
+            'current_user': data,
+            'chart': chart,
+            'sells_stock2': sells_stock,
+        }
+        return render(request, 'generatereport.html', param)
+    return redirect('index')
+
+
+
 ###############################################################################   employee sections #################################
 #control session of employees login
 def emphome2(request):
@@ -179,6 +279,7 @@ def logout2(request):
 def addproducts(request):
     if 'check_emp' in request.session:
         current_emp = request.session['check_emp']
+        emp_data = employee2.objects.get(phone=current_emp)
         if request.method == 'POST':
             category = request.POST.get('category')
             pro_name = request.POST.get('pro_name')
@@ -187,15 +288,24 @@ def addproducts(request):
             discount = request.POST.get('discount')
             unit = request.POST.get('unit')
             today = date.today()
-            data_save = products(category = category, pro_name = pro_name, qty = qty, mrp = mrp, discount = discount, unit = unit, date = today)
-            data_save.save()
-            data = products.objects.all()
-            sms = 'Product saved successfully'
-            param = {
-                'data' : data,
-                'sms' : sms
-            }
-            return render(request, 'emp_home.html', param)
+            if products.objects.filter(pro_name = pro_name).count():
+                sms = pro_name + ' already exists, please try another'
+                param = {
+                    'sms' : sms,
+                    'current_emp' : emp_data,
+                }
+                return render(request, 'emp_home.html', param)
+            else:
+                data_save = products(category=category, pro_name=pro_name, qty=qty, mrp=mrp, discount=discount, unit=unit, date=today)
+                data_save.save()
+                data = products.objects.all()
+                sms = 'Product saved successfully'
+                param = {
+                    'data': data,
+                    'sms': sms,
+                    'current_emp': emp_data,
+                }
+                return render(request, 'emp_home.html', param)
         return render(request, 'emp_home.html')
     else:
         return redirect('index')
@@ -290,9 +400,6 @@ def additems(request):
             return render(request, 'bill.html', { 'current_emp' : emp_data })
         return render(request, 'bill.html', { 'current_emp' : emp_data })
     return redirect('index')
-
-
-
 
 
 #remove cart items
@@ -413,6 +520,7 @@ def get_invoice(request):
             email = request.POST.get('email')
             phone = request.POST.get('phone')
             inv_no = request.POST.get('inv_no')
+            tmp = inv_no
             gtotal = request.POST.get('gtotal')
 
             emp_id = request.POST.get('emp_id')
@@ -430,9 +538,10 @@ def get_invoice(request):
                 unit = i.unit
                 discount = i.discount
                 amount = i.amount
+
                 save_data = sells_items(category=category, pro_name=pro_name, qty=qty, mrp=mrp, unit=unit, discount=discount, amount=amount, date=today, inv_no=inv_no, mod=mod)
                 save_data.save()
-
+            
             cus_save = customers_sells(cus_name=cus_name, email=email, phone=phone, inv_no=inv_no, date=today, gtotal=gtotal)
             cus_save.save()
 
@@ -441,10 +550,20 @@ def get_invoice(request):
 
             add_products.objects.filter(emp_id=emp_data.id).delete()
 
-            return redirect('searchproducts')
+            sells_data = sells_items.objects.filter(inv_no = tmp)
+            cus_data = customers_sells.objects.filter(inv_no = tmp)
+            invdata = invoice_data.objects.filter(inv_no = tmp)
+            param = {
+                'current_emp' : emp_data,
+                'data' : sells_data,
+                'cus_data' : cus_data,
+                'invdata' : invdata,
+            }
+
+            #html = "Customer %s"%inv_no
+            return render(request, 'bills.html', param)
         return redirect('searchproducts')
     return redirect('index')
-
 
 def updateproducts(request):
     if 'check_emp' in request.session:
@@ -468,6 +587,280 @@ def editproducts(request, id):
         return render(request, 'update_products.html', param)
     return render(request, 'update_products.html')
     return redirect('index')
+
+def searchproduct2(request):
+    if 'check_emp' in request.session:
+        current_emp = request.session['check_emp']
+        emp_data = employee2.objects.get(phone=current_emp)
+        if request.method == 'POST':
+            pro_name = request.POST.get('pro_name')
+            data = products.objects.filter(pro_name = pro_name)
+            if data:
+                param = {
+                    'data' : data,
+                    'current_emp' : emp_data,
+                }
+                return render(request, 'update_products.html', param)
+            else:
+                sms = 'No data found!'
+                param = {
+                    'sms' : sms,
+                    'current_emp' : emp_data,
+                }
+                return render(request, 'update_products.html', param)
+            return render(request, 'update_products.html')
+        return render(request, 'update_products.html')
+    return redirect('index')
+
+#update items after editing,
+def update_item(request):
+    if 'check_emp' in request.session:
+        current_emp = request.session['check_emp']
+        emp_data = employee2.objects.get(phone=current_emp)
+        if request.method == 'POST':
+            id = request.POST.get('id')
+            category = request.POST.get('category')
+            pro_name = request.POST.get('pro_name')
+            qty = request.POST.get('qty')
+            mrp = request.POST.get('mrp')
+            discount = request.POST.get('discount')
+            unit = request.POST.get('unit')
+            date = request.POST.get('date')
+            data = products.objects.filter(id=id).update(category=category, pro_name=pro_name, qty=qty, mrp=mrp, discount=discount, unit=unit)
+            return redirect('emphome2')
+        return redirect('emphome2')
+    return redirect('index')
+
+#update item 2
+def update_item2(request):
+    if 'check_emp' in request.session:
+        current_emp = request.session['check_emp']
+        emp_data = employee2.objects.get(phone=current_emp)
+        if request.method == 'POST':
+            id = request.POST.get('id')
+            av_qty = request.POST.get('av_qty')
+            qty = request.POST.get('qty')
+            today = date.today()
+            total = int(av_qty)+int(qty)
+            print(total)
+            data = products.objects.filter(id=id).update(qty=total, date = today)
+            sms = 'update data successfully'
+            param = {
+                'current_emp' : emp_data,
+                'sms1' : sms,
+                'updateqty' : data,
+            }
+            return render(request, 'update_products.html', param)
+        return redirect('emphome2')
+    return redirect('index')
+
+#show products sellings,
+def productselling(request):
+    if 'check_emp' in request.session:
+        current_emp = request.session['check_emp']
+        emp_data = employee2.objects.get(phone=current_emp)
+        param = {
+            'current_emp': emp_data,
+        }
+        return render(request, 'showsellproduct.html', param)
+    return redirect('index')
+
+#search products linked to showsellproduct.html
+def searchproducts3(request):
+    if 'check_emp' in request.session:
+        current_emp = request.session['check_emp']
+        emp_data = employee2.objects.get(phone=current_emp)
+        if request.method == 'POST':
+            pro_name = request.POST.get('pro_name')
+            date = request.POST.get('date')
+            inv_no = request.POST.get('inv_no')
+            data = sells_items.objects.filter(Q(pro_name = pro_name) | Q(date = date) | Q(inv_no=inv_no))
+            cus_data = customers_sells.objects.filter(inv_no=inv_no)
+            invdata = invoice_data.objects.filter(inv_no=inv_no)
+            if data:
+                param = {
+                    'current_emp': emp_data,
+                    'data': data,
+                    'cus_data' : cus_data,
+                    'invdata' : invdata,
+                }
+                return render(request, 'showsellproduct.html', param)
+            else:
+                sms = 'No data found!'
+                param = {
+                    'current_emp': emp_data,
+                    'sms': sms,
+                }
+                return render(request, 'showsellproduct.html', param)
+        return redirect('productselling')
+    return redirect('index')
+
+#path -> to emp_ac_settings.html,
+def ac_settings(request):
+    if 'check_emp' in request.session:
+        current_emp = request.session['check_emp']
+        emp_data = employee2.objects.get(phone=current_emp)
+        param = {
+            'current_emp' : emp_data,
+        }
+        return render(request, 'emp_ac_settings.html', param)
+    return redirect('index')
+
+#path show employee details own,
+def showdetails(request):
+    if 'check_emp' in request.session:
+        current_emp = request.session['check_emp']
+        emp_data = employee2.objects.get(phone=current_emp)
+        emp_data1 = employee2.objects.filter(id = emp_data.id)
+        param = {
+            'current_emp' : emp_data,
+            'emp_data1' : emp_data1,
+        }
+        return render(request, 'emp_ac_settings.html', param)
+    return redirect('index')
+
+#path add bank details
+def addbank_ac(request):
+    if 'check_emp' in request.session:
+        current_emp = request.session['check_emp']
+        emp_data = employee2.objects.get(phone=current_emp)
+        if request.method == 'POST':
+            emp_id = request.POST.get('emp_id')
+            emp_name = request.POST.get('emp_name')
+            emp_phone = request.POST.get('emp_phone')
+            ifc = request.POST.get('ifc')
+            bank_name = request.POST.get('bank_name')
+            branch = request.POST.get('branch')
+            accountType = request.POST.get('accountType')
+            ac_number = request.POST.get('ac_number')
+            if bank_ac.objects.filter(emp_id = emp_id).count():
+                sms = 'You have already add your account!'
+                param = {
+                    'current_emp' : emp_data,
+                    'sms' : sms,
+                }
+                return render(request, 'emp_ac_settings.html', param)
+            elif bank_ac.objects.filter(ac_number = ac_number).count():
+                sms = 'Invalid Account-Number!'
+                param = {
+                    'current_emp' : emp_data,
+                    'sms' : sms,
+                }
+                return render(request, 'emp_ac_settings.html', param)
+            else:
+                ac_save = bank_ac(bank_name = bank_name, branch = branch, ifc = ifc, ac_type = accountType, ac_number = ac_number, emp_id = emp_id, emp_name = emp_name, emp_phone = emp_phone)
+                ac_save.save()
+                sms = 'Account details saved successfully!'
+                param = {
+                    'current_emp' : emp_data,
+                    'sms' : sms,
+                }
+                return render(request, 'emp_ac_settings.html', param)
+            return render(request, 'emp_ac_settings.html', { 'current_emp' : emp_data })
+        return render(request, 'emp_ac_settings.html', { 'current_emp' : emp_data })
+    return redirect('index')
+
+#show bank details,
+def showbankdetails(request):
+    if 'check_emp' in request.session:
+        current_emp = request.session['check_emp']
+        emp_data = employee2.objects.get(phone=current_emp)
+        show_bank = bank_ac.objects.filter(emp_id = emp_data.id)
+        if show_bank:
+            param = {
+                'current_emp': emp_data,
+                'show_bank': show_bank,
+            }
+            return render(request, 'emp_ac_settings.html', param)
+        else:
+            sms = 'You have not add your Bank-Account yet!'
+            param = {
+                'current_emp': emp_data,
+                'sms': sms,
+            }
+            return render(request, 'emp_ac_settings.html', param)
+    return redirect('index')
+
+#delete bank details,
+def delete_bank_details(request, emp_id):
+    if 'check_emp' in request.session:
+        current_emp = request.session['check_emp']
+        emp_data = employee2.objects.get(phone=current_emp)
+        emp_bank = bank_ac.objects.get(emp_id=emp_id)
+        emp_bank.delete()
+        sms = 'Bank-Details deleted successfully!'
+        param = {
+            'current_emp' : emp_data,
+            'sms' : sms,
+        }
+        return render(request, 'emp_ac_settings.html', param)
+    return redirect('index')
+
+#edit bank-details
+def edit_bank_details(request, emp_id):
+    if 'check_emp' in request.session:
+        current_emp = request.session['check_emp']
+        emp_data = employee2.objects.get(phone=current_emp)
+        emp_bank = bank_ac.objects.get(emp_id=emp_id)
+        param = {
+            'current_emp' : emp_data,
+            'bank_data' : emp_bank,
+        }
+        return render(request, 'edit_bank.html', param)
+    return redirect('index')
+
+#update bank details,
+def update_bank_details(request):
+    if 'check_emp' in request.session:
+        current_emp = request.session['check_emp']
+        emp_data = employee2.objects.get(phone=current_emp)
+        if request.method == 'POST':
+            emp_id = request.POST.get('emp_id')
+            emp_name = request.POST.get('emp_name')
+            emp_phone = request.POST.get('emp_phone')
+            bank_name = request.POST.get('bank_name')
+            branch = request.POST.get('branch')
+            ifc = request.POST.get('ifc')
+            ac_type = request.POST.get('ac_type')
+            ac_number = request.POST.get('ac_number')
+            r = re.fullmatch('[6-9][0-9]{9}',emp_phone)
+            if r != None:
+                update_details = bank_ac.objects.filter(emp_id=emp_id).update(emp_name=emp_name, emp_phone=emp_phone, bank_name=bank_name, branch=branch, ifc=ifc, ac_type=ac_type, ac_number=ac_number)
+                sms = 'Your Data updated successfully!'
+                param = {
+                    'current_emp' : emp_data,
+                    'sms' : sms,
+                }
+                return render(request, 'emp_ac_settings.html', param)
+            else:
+                sms = 'Please enter valid data!'
+                param = {
+                    'current_emp': emp_data,
+                    'sms': sms,
+                }
+                return render(request, 'emp_ac_settings.html', param)
+            return render(request, 'emp_ac_settings.html', { 'current_emp' : emp_data })
+        #return render(request, 'edit_bank.html', {'current_emp': emp_data})
+    return redirect('index')
+
+#password change path->change_pass.html
+def change_password(request):
+    if 'check_emp' in request.session:
+        current_emp = request.session['check_emp']
+        emp_data = employee2.objects.get(phone=current_emp)
+        param = {
+            'current_emp' : emp_data,
+        }
+        return render(request, 'change_pass.html', param)
+    return redirect('index')
+
+#password change function
+def change_password2(request):
+    if 'check_emp' in request.session:
+        current_emp = request.session['check_emp']
+        emp_data = employee2.objects.get(phone=current_emp)
+        oldpass = emp_data.password
+        
 
 
 

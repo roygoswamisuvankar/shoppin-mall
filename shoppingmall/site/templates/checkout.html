@@ -218,31 +218,9 @@ ul a{
                                 <input type="checkbox" name="check" id="check" required/>I am confirm of above information
                             </td>
                             <td colspan="2" style="text-align : center;">
-                                <button type="button" name="print" id="print">Print</button>
+
                                 <input type="submit" name="submit" value="Get Invoice" id="invoice"/>
                             </td>
-                            <script type="text/javascript">
-                                $(document).ready(function(){
-                                    $("#invoice").hide();
-                                    $("#check").hide()
-
-                                    function printData()
-                                    {
-                                       var divToPrint=document.getElementById("printarea");
-                                       newWin= window.open("");
-                                       newWin.document.write(divToPrint.outerHTML);
-                                       newWin.print();
-                                       newWin.close();
-                                    }
-
-                                    $('#print').on('click',function(){
-                                        printData();
-                                        $("#invoice").show();
-                                        $("#print").hide();
-                                        $("#check").show();
-                                    })
-                                });
-                            </script>
                         </tr>
                     </table>
                 </form>

@@ -132,9 +132,8 @@ ul a{
         <li><a href="{% url 'show_in_stocks' %}">Show Available products in stocks</a></li>
         <li><a href="{% url 'updateproducts' %}">Updates products</a></li>
         <li class="active"><a href="{% url 'productbill' %}">Product Billing</a></li>
-        <li><a href="#">Show Product selling</a></li>
-        <li><a href="#">Generate Report</a></li>
-        <li><a href="#">Your Account Settings</a></li>
+        <li><a href="{% url 'productselling' %}">Show Product Selling</a></li>
+        <li><a href="{% url 'ac_settings' %}">Your Account Settings</a></li>
         <li><a href="{% url 'logout2' %}">Logout</a></li>
     </ul>
   </div>
@@ -157,6 +156,18 @@ ul a{
                         </td>
                     </tr>
                 </table>
+                <style type="text/css">
+                    input[type=submit]{
+                        border : green;
+                        border-radius : 2px;
+                        border-color : green;
+                        color : white;
+                        background-color : green;
+                        cursor : pointer;
+                        color : white;
+                        padding : 5px 8px;
+                    }
+                </style>
             </form>
         </div>
     </div>
@@ -205,11 +216,19 @@ ul a{
                     {% endfor %}
                     <tr>
                         <td></td>
-                        <td><input type="submit" value="Add product" id="add"/></td>
+                        <td><input type="submit" value="Add to cart" id="add"/></td>
                     </tr>
                 </table>
                 {% endif %}
             </form>
+            <style type="text/css">
+                input[type=text], [type=number]{
+                        padding : 5px 8px;
+                        border-radius : 2px;
+                        border : 1px solid lightgray;
+                        outline-color : grey;
+            }
+            </style>
         </div>
     </div>
     <div class="col-6">
@@ -218,7 +237,7 @@ ul a{
                 {% csrf_token %}
                 {% if items %}
                 <h3>Cart List Items</h3>
-            <table border="1">
+            <table border="1" id="addcart">
                 <tr>
                     <th>ID</th>
                     <th>Prouct ID</th>
@@ -245,13 +264,33 @@ ul a{
                     <td>{{ i.unit }}</td>
                     <td>{{ i.discount }}%</td>
                     <td>{{ i.amount }}</td>
-                    <td><a href="remove_cart/{{ i.id }}" onclick="return confirm('Are you sure, to remove this item?')">Remove</a></td>
+                    <td><a href="remove_cart/{{ i.id }}" onclick="return confirm('Are you sure, to remove this item?')" id="remove" >Remove</a></td>
                 </tr>
                 {% endfor %}
             </table>
-                <input type="submit" value="Checkout"/>&nbsp;<a href="{% url 'cancel_cart' %}" onclick="return confirm('Are you sure, to remove all items?')">Cancel</a>
+                </br>
+                <input type="submit" value="Checkout"/>&nbsp;&nbsp; <a href="{% url 'cancel_cart' %}" onclick="return confirm('Are you sure, to remove all items?')" id="cancel" >Cancel</a>
             {% endif %}
             </form>
+            <style type="text/css">
+                #addcart{
+                    border-collapse: collapse;
+                    padding : 5px 8px;
+                }
+                #addcart th{
+                    background-color : grey;
+                    color : white;
+                    padding : 5px 8px;
+                }
+                #addcart td{
+                    padding : 5px 8px;
+                }
+                #cancel, #remove{
+                    padding : 5px 8px;
+                    color : red;
+                    text-decoration : none;
+                }
+            </style>
         </div>
     </div>
     <!--end of main body content-->

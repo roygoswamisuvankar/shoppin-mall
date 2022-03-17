@@ -72,6 +72,17 @@ class invoice_data(models.Model):
     emp_id = models.IntegerField(max_length=50)
     emp_name = models.CharField(max_length=30)
 
+#bank account details,
+class bank_ac(models.Model):
+    bank_name = models.CharField(max_length=50)
+    branch = models.CharField(max_length=50)
+    ifc = models.CharField(max_length=50)
+    ac_type = models.CharField(max_length=50)
+    ac_number = models.CharField(max_length=50, default='')
+    emp_id = models.IntegerField(max_length=10)
+    emp_name = models.CharField(max_length=20, default='')
+    emp_phone = models.CharField(max_length=20, default='')
+
 
 
 
